@@ -1,3 +1,5 @@
+//Home page for user after login
+
 import Grid from "@mui/material/Grid";
 import useAuthentication from "../../hooks/useAuthentication";
 import {useContext} from "react";

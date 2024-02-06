@@ -1,9 +1,13 @@
+//Logout button component
+
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import useAuthentication from "../../hooks/useAuthentication";
 import {useContext} from "react";
+import {clearAllMetadata} from "../../store/actions/metadataAction";
+import {connect} from "react-redux";
 
-const Logout = ({sx}) => {
+const Logout = ({sx, resetMetadata}) => {
 
 	const {AuthCtx} = useAuthentication();
 	const {logout} = useContext(AuthCtx);
@@ -14,6 +18,7 @@ const Logout = ({sx}) => {
 	const navigate = useNavigate();
 
 	let performLogout = () => {
+		resetMetadata();
 		logout().then(() => {
 			navigate("/login");
 		});
@@ -29,4 +34,17 @@ const Logout = ({sx}) => {
 	);
 };
 
-export default Logout;
+const mapStateToProps = (state) => {
+	return {
+		sortBy: state.metadata.selectedSortBy,
+		category: state.metadata.selectedCategory,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		resetMetadata: () => dispatch(clearAllMetadata()),
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Logout);

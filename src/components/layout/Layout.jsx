@@ -1,3 +1,5 @@
+//Parent component that sets up everything on the page
+
 import Container from '@mui/material/Container';
 import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import Grid from '@mui/material/Grid';

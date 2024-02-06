@@ -39,6 +39,10 @@ const actionReducer = (state = initialState, action) => {
 			};
 			break;
 		}
+		case "CLEAR_ALL": {
+			data = initialState;
+			break;
+		}
 		default: {
 			data = state;
 		}

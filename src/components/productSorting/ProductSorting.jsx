@@ -1,3 +1,6 @@
+//Product sorting based on different criteria
+//NOTE: PLEASE NOTE THAT CREATION DATE OR MODIFICATION DATE IS NOT RECEIVED FROM SERVER, HENCE "NEWEST" CRITERIA WON't WORK
+
 import {FormControl, InputLabel, Select} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import {useState} from "react";

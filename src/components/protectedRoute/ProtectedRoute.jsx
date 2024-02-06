@@ -1,3 +1,5 @@
+//Protected Component for restricting access
+
 import useAuthentication from "../../hooks/useAuthentication";
 import {useContext} from "react";
 import Login from "../login/Login";

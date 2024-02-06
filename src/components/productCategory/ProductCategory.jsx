@@ -1,3 +1,5 @@
+//Product category toggle button
+
 import {ToggleButton, ToggleButtonGroup} from "@mui/material";
 import {clearFilter, setFilter} from "../../store/actions/metadataAction";
 import {connect} from "react-redux";

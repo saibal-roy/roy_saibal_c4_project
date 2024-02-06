@@ -1,3 +1,5 @@
+//Fancy text box for searching products by name after user has logged in
+
 import SearchIcon from '@mui/icons-material/Search';
 import {useState} from "react";
 import {alpha, FormControl, InputAdornment, OutlinedInput} from "@mui/material";
@@ -27,9 +29,9 @@ const AppBarSearch = () => {
 				value={searchFor}
 				onChange={(event) => changeVal(event.target.value)}
 				onBlur={(event) => blurVal(event.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") {
-						blurVal(e.target.value);
+				onKeyDown={(event) => {
+					if (event.key === "Enter") {
+						blurVal(event.target.value);
 					}
 				}}
 				startAdornment={

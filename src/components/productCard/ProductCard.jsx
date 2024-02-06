@@ -1,9 +1,12 @@
+//Product card for showing product details
+
 import {Card, CardActions, CardContent, CardMedia} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import {Delete, Edit} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
+import "./productCard.css";
 
 const ProductCard = ({mode, deleteProduct, modifyProduct, buyProduct, ...details}) => {
 
@@ -62,15 +65,15 @@ const ProductCard = ({mode, deleteProduct, modifyProduct, buyProduct, ...details
 				<Grid container>
 					<Grid item xs={9}>
 						<div style={{display: 'flex', justifyContent: 'left'}}>
-							<Typography gutterBottom variant="h6" component="div">
+							<Typography gutterBottom variant="h6" component="div" className="wrap_text" title={details.name}>
 								{details.name}
 							</Typography>
 						</div>
 					</Grid>
 					<Grid item xs={3}>
 						<div style={{display: 'flex', justifyContent: 'right'}}>
-							<Typography gutterBottom variant="h6" component="div">
-								&#8377; {details.price}
+							<Typography gutterBottom variant="h6" component="div" className="wrap_text" title={'\u20B9 ' + details.price}>
+								{'\u20B9 ' + details.price}
 							</Typography>
 						</div>
 					</Grid>

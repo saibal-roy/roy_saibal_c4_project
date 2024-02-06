@@ -1,3 +1,5 @@
+//Component for showing list of all products
+
 import {initCatalog} from "../../store/actions/metadataAction";
 import {connect} from "react-redux";
 import ProductCard from "../productCard/ProductCard";
@@ -6,7 +8,7 @@ import {useContext, useState} from "react";
 import {Modal} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import {deleteProduct} from "../../api/productAPIs";
+import {deleteProduct, viewProduct} from "../../api/productAPIs";
 import useAuthentication from "../../hooks/useAuthentication";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -66,6 +68,7 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 						return 0;
 					}
 				} else if (s === "NEWEST") {
+					//NOTE: PLEASE NOTE THAT CREATION DATE OR MODIFICATION DATE IS NOT RECEIVED FROM SERVER, HENCE "NEWEST" CRITERIA WON't WORK
 					let aTime = new Date(a.lastUpdated);
 					let bTime = new Date(b.lastUpdated);
 					if(aTime < bTime) {
@@ -117,11 +120,25 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 	};
 
 	let initiateViewProduct = (details) => {
-		navigate("/product/view", {
-			state: JSON.stringify({
-				value: details,
-			})
-		});
+		if(isAccessTokenValid()) {
+			setBusy(true);
+			viewProduct(details.id, accessToken).then((json) => {
+				navigate("/product/view", {
+					state: JSON.stringify({
+						value: json.value,
+					})
+				});
+				setBusy(false);
+			}).catch((json) => {
+				broadcastMessage(json.reason, "error");
+				setBusy(false);
+			});
+		} else {
+			broadcastMessage("Session expired. Please login again!", "info");
+			logout().then(() => {
+				navigate("/login");
+			});
+		}
 	};
 
 	let handleClose = () => {
@@ -137,7 +154,7 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 				broadcastMessage("Product " + product.name + " deleted successfully.", "success");
 				setBusy(false);
 				setProduct(null);
-				reFetchAllData();
+				reFetchAllData(accessToken);
 			}).catch((json) => {
 				broadcastMessage(json.reason, "error");
 				setBusy(false);
@@ -237,7 +254,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		reFetchAllData: () => dispatch(initCatalog()),
+		reFetchAllData: (accessToken) => dispatch(initCatalog(accessToken)),
 	};
 };
 

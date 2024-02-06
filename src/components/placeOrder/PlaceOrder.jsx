@@ -1,3 +1,5 @@
+//Order placement sequence
+
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import {Step, StepLabel, Stepper} from "@mui/material";
@@ -191,7 +193,10 @@ const PlaceOrder = () => {
 					activeStep === 0 &&
 					<Grid item xs={12}>
 						<div style={{display: 'flex', justifyContent: 'center'}}>
-							<ItemDetail />
+							<ItemDetail
+								productQuantity={orderDetails.quantity}
+								selectedProduct={json.product}
+							/>
 						</div>
 					</Grid>
 				}

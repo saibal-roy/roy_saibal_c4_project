@@ -1,3 +1,5 @@
+//Header of website to show different options according to user login
+
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import {ShoppingCart} from "@mui/icons-material";

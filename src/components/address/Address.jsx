@@ -1,3 +1,5 @@
+// Address Component to creating/selecting address at the time of placing order.
+
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -10,8 +12,9 @@ import useAuthentication from "../../hooks/useAuthentication";
 import {createAddress, fetchAllAddresses} from "../../api/addressAPIs";
 import {FormControl, InputLabel, Select} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import useServices from "../../hooks/useServices";
 import {useNavigate} from "react-router-dom";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 const Address = ({callbackFunction, address}) => {
 
@@ -65,11 +68,18 @@ const Address = ({callbackFunction, address}) => {
 	const {AuthCtx} = useAuthentication();
 	const {loggedInUserId, accessToken, isAccessTokenValid, logout} = useContext(AuthCtx);
 	const [addressList, setAddressList] = useState([]);
-	const {ServicesCtx} = useServices();
-	const {broadcastMessage} = useContext(ServicesCtx);
 	const navigate = useNavigate();
+	const [showInfo, setShowInfo] = useState(false);
+	const [showMessage, setShowMessage] = useState("");
+	const [showMessageLevel, setShowMessageLevel] = useState("error");
 
-	let validateData = () => {
+	let hideAndResetMessage = () => {
+		setShowInfo(false);
+		setShowMessage("");
+		setShowMessageLevel("error");
+	};
+
+	let validateAndPersistData = () => {
 		setBusy(true);
 		let data = {
 			...formData
@@ -77,7 +87,7 @@ const Address = ({callbackFunction, address}) => {
 		let requestJson = {
 			user: loggedInUserId,
 		};
-		let valid = true;
+		let validAddress = true;
 		for(let k in formData) {
 			let json = getValidity(k, formData[k].value);
 			data[k] = {
@@ -85,25 +95,31 @@ const Address = ({callbackFunction, address}) => {
 				error: !json.valid,
 				errorMessage: json.message,
 			};
-			valid = valid && json.valid;
+			validAddress = validAddress && json.valid;
 			if(json.valid) {
 				requestJson[k] = data[k].value;
 			}
 		}
 		setFormData(data);
-		if(valid) {
+		if(validAddress) {
 			if(isAccessTokenValid()) {
 				createAddress(requestJson, accessToken).then(() => {
-					broadcastMessage("Address saved successfully.", "success");
+					setShowInfo(true);
+					setShowMessage("Address saved successfully.");
+					setShowMessageLevel("success");
 					setBusy(false);
 					setFormData(initialState);
 					initDropdown();
 				}).catch(json => {
-					broadcastMessage(json.reason, "error");
+					setShowInfo(true);
+					setShowMessage(json.reason);
+					setShowMessageLevel("error");
 					setBusy(false);
 				});
 			} else {
-				broadcastMessage("Session expired. Please login again!", "info");
+				setShowInfo(true);
+				setShowMessage("Session expired. Please login again!");
+				setShowMessageLevel("info");
 				logout().then(() => {
 					navigate("/login");
 				});
@@ -129,8 +145,13 @@ const Address = ({callbackFunction, address}) => {
 		} else {
 			switch (field) {
 				case "name": {
-					valid = matchRegex(value, "^([A-Za-z\\s]+)$");
-					message = "Please enter valid name.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Name can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z\\s]+)$");
+						message = "Please enter valid name.";
+					}
 					break;
 				}
 				case "contactNumber": {
@@ -139,23 +160,43 @@ const Address = ({callbackFunction, address}) => {
 					break;
 				}
 				case "street": {
-					valid = matchRegex(value, "^([A-Za-z0-9,/\\s\\-_@]+)$");
-					message = "Please enter valid street.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Street can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z0-9,/\\s\\-_@]+)$");
+						message = "Please enter valid street.";
+					}
 					break;
 				}
 				case "city": {
-					valid = matchRegex(value, "^([A-Za-z]+)$");
-					message = "Please enter valid city.";
+					if(value.length > 255) {
+						valid = false;
+						message = "City can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z]+)$");
+						message = "Please enter valid city.";
+					}
 					break;
 				}
 				case "state": {
-					valid = matchRegex(value, "^([A-Za-z\\s]+)$");
-					message = "Please enter valid state.";
+					if(value.length > 255) {
+						valid = false;
+						message = "State can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z\\s]+)$");
+						message = "Please enter valid state.";
+					}
 					break;
 				}
 				case "landmark": {
-					valid = matchRegex(value, "^([A-Za-z0-9,/\\s\\-_@]+)$");
-					message = "Please enter valid landmark.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Landmark can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z0-9,/\\s\\-_@]+)$");
+						message = "Please enter valid landmark.";
+					}
 					break;
 				}
 				case "zipcode": {
@@ -216,12 +257,14 @@ const Address = ({callbackFunction, address}) => {
 				setAddressList([]);
 			});
 		} else {
-			broadcastMessage("Session expired. Please login again!", "info");
+			setShowInfo(true);
+			setShowMessage("Session expired. Please login again!");
+			setShowMessageLevel("info");
 			logout().then(() => {
 				navigate("/login");
 			});
 		}
-	}, [accessToken, isAccessTokenValid, broadcastMessage, navigate, logout]);
+	}, [accessToken, isAccessTokenValid, navigate, logout]);
 
 	useEffect(() => {
 		initDropdown();
@@ -243,13 +286,13 @@ const Address = ({callbackFunction, address}) => {
 									onChange={handleChange}
 								>
 									{
-										(addressList === null || addressList.length === 0) &&
+										(addressList === undefined || addressList === null || addressList.length === 0) &&
 										<MenuItem disabled value="">
 											No address saved
 										</MenuItem>
 									}
 									{
-										addressList !== null && addressList.length > 0 &&
+										addressList !== undefined && addressList !== null && addressList.length > 0 &&
 										addressList.map((element, index) => {
 											return (
 												<MenuItem
@@ -403,7 +446,7 @@ const Address = ({callbackFunction, address}) => {
 							<Button variant="contained"
 									color="primary"
 									fullWidth
-									onClick={validateData}
+									onClick={validateAndPersistData}
 							>
 								SAVE ADDRESS
 							</Button>
@@ -418,6 +461,16 @@ const Address = ({callbackFunction, address}) => {
 			>
 				<CircularProgress color="inherit"/>
 			</Backdrop>
+			<Snackbar
+				anchorOrigin={{vertical: "top", horizontal: "right"}}
+				open={showInfo}
+				autoHideDuration={4000}
+				onClose={() => hideAndResetMessage()}
+			>
+				<Alert onClose={() => hideAndResetMessage()} severity={showMessageLevel} sx={{width: '100%'}}>
+					{showMessage}
+				</Alert>
+			</Snackbar>
 		</Box>
 	);
 };

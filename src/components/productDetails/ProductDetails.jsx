@@ -1,3 +1,5 @@
+//Page for showing product details
+
 import {useLocation, useNavigate} from "react-router-dom";
 import {useCallback, useContext, useEffect, useState} from "react";
 import Grid from "@mui/material/Grid";

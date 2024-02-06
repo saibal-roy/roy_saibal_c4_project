@@ -1,3 +1,5 @@
+//Component for product creation and modification
+
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -133,7 +135,7 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 				callbackFunction(requestJson, accessToken).then(json => {
 					broadcastMessage(json.message, "success");
 					setBusy(false);
-					reFetchAllData();
+					reFetchAllData(accessToken);
 					navigate("/home");
 				}).catch(json => {
 					broadcastMessage(json.reason, "error");
@@ -166,18 +168,33 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 		} else {
 			switch (field) {
 				case "name": {
-					valid = matchRegex(value, "^([A-Za-z\\s]+)$");
-					message = "Please enter valid product name.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Product name can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z\\s]+)$");
+						message = "Please enter valid product name.";
+					}
 					break;
 				}
 				case "category": {
-					valid = matchRegex(value, "^([A-Za-z-\\s]+)$");
-					message = "Please enter valid category.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Category can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z-\\s]+)$");
+						message = "Please enter valid category.";
+					}
 					break;
 				}
 				case "manufacturer": {
-					valid = matchRegex(value, "^([A-Za-z\\s]+)$");
-					message = "Please enter valid manufacturer.";
+					if(value.length > 255) {
+						valid = false;
+						message = "Manufacturer can be of length 255 characters";
+					} else {
+						valid = matchRegex(value, "^([A-Za-z\\s]+)$");
+						message = "Please enter valid manufacturer.";
+					}
 					break;
 				}
 				case "availableItems": {
@@ -395,7 +412,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		reFetchAllData: () => dispatch(initCatalog()),
+		reFetchAllData: (accessToken) => dispatch(initCatalog(accessToken)),
 	};
 };
 

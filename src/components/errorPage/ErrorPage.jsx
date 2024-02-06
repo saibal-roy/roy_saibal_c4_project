@@ -1,3 +1,5 @@
+//Error Page when user tries to access invalid url
+
 import Grid from "@mui/material/Grid";
 import LocationOffOutlinedIcon from '@mui/icons-material/LocationOffOutlined';
 import Typography from "@mui/material/Typography";

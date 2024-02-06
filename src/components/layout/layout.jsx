@@ -19,6 +19,7 @@ import Footer from "../footer/Footer";
 import ErrorPage from "../errorPage/ErrorPage";
 import Logout from "../logout/Logout";
 import useAuthentication from "../../hooks/useAuthentication";
+import ProductPage from "../productPage/ProductPage";
 import {createProduct, modifyProduct} from "../../api";
 import BroadcastMessage from "../broadcastMessage/BroadcastMessage";
 import Home from "../home/Home";
@@ -213,7 +214,19 @@ const Layout = () => {
 								<SignUp/>
 							}
 						/>
-
+						<Route
+							path="/product/add"
+							element={
+								<ProtectedRoute role={["ADMIN"]}>
+									<ProductPage
+										mode={"CREATE"}
+										buttonText="SAVE PRODUCT"
+										headingText="Add Product"
+										callbackFunction={createProduct}
+									/>
+								</ProtectedRoute>
+							}
+						/>
 						<Route
 							path="*"
 							element={

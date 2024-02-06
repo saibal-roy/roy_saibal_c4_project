@@ -19,7 +19,7 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [product, setProduct] = useState(null);
 	const {AuthCtx} = useAuthentication();
-	const {accessToken} = useContext(AuthCtx);
+	const {accessToken, isAccessTokenValid, logout} = useContext(AuthCtx);
 	const [busy, setBusy] = useState(false);
 	const {ServicesCtx} = useServices();
 	const {broadcastMessage} = useContext(ServicesCtx);
@@ -66,10 +66,11 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 						return 0;
 					}
 				} else if (s === "NEWEST") {
-					//TODO: no field name createdate/modifieddate
-					if(a.price < b.price) {
+					let aTime = new Date(a.lastUpdated);
+					let bTime = new Date(b.lastUpdated);
+					if(aTime < bTime) {
 						return 1;
-					} else if(a.price > b.price) {
+					} else if(aTime > bTime) {
 						return -1;
 					} else {
 						return 0;
@@ -131,16 +132,23 @@ const ProductListing = ({mode, productList, sortBy, category, reFetchAllData}) =
 	const proceedDelete = () => {
 		setBusy(true);
 		setDeleteModal(false);
-		deleteProduct(product.id, accessToken).then(() => {
-			broadcastMessage("Product " + product.name + " deleted successfully.", "success");
-			setBusy(false);
-			setProduct(null);
-			reFetchAllData();
-		}).catch((json) => {
-			broadcastMessage(json.reason, "error");
-			setBusy(false);
-			setProduct(null);
-		});
+		if(isAccessTokenValid()) {
+			deleteProduct(product.id, accessToken).then(() => {
+				broadcastMessage("Product " + product.name + " deleted successfully.", "success");
+				setBusy(false);
+				setProduct(null);
+				reFetchAllData();
+			}).catch((json) => {
+				broadcastMessage(json.reason, "error");
+				setBusy(false);
+				setProduct(null);
+			});
+		} else {
+			broadcastMessage("Session expired. Please login again!", "info");
+			logout().then(() => {
+				navigate("/login");
+			});
+		}
 	};
 
 	let products = getFilteredProductsBasedOnQuery(getSortedProducts(getFilteredProducts(productList, category), sortBy), searchFor);

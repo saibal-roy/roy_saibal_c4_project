@@ -14,11 +14,20 @@ export const fetchAllCategories = (accessToken) => {
 		},
 	}).then((response) => {
 		response.json().then((json) => {
-			json.sort();
-			json = ["ALL", ...json];
+			//capitalise every category
+			//show only unique
+			let arr = [];
+			for(let i = 0; i < json.length; i++) {
+				let c = json[i].toUpperCase();
+				if(!arr.includes(c)) {
+					arr.push(c);
+				}
+			}
+			arr.sort();
+			arr = ["ALL", ...arr];
 			if(response.ok) {
 				promiseResolveRef({
-					data: json,
+					data: arr,
 					response: response,
 				});
 			} else {

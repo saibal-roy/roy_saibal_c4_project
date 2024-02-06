@@ -11,8 +11,9 @@ import {createAddress, fetchAllAddresses} from "../../api/addressAPIs";
 import {FormControl, InputLabel, Select} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import useServices from "../../hooks/useServices";
+import {useNavigate} from "react-router-dom";
 
-const Address = ({callbackFunction}) => {
+const Address = ({callbackFunction, address}) => {
 
 	let initialState = {
 		name: {
@@ -52,14 +53,21 @@ const Address = ({callbackFunction}) => {
 		},
 	};
 
+	if(address !== null && address !== undefined) {
+		address = address.id;
+	} else {
+		address = "";
+	}
+
 	const [formData, setFormData] = useState(initialState);
-	const [selectedAddress, setSelectedAddress] = useState("");
+	const [selectedAddress, setSelectedAddress] = useState(address);
 	const [busy, setBusy] = useState(false);
 	const {AuthCtx} = useAuthentication();
-	const {loggedInUserId, accessToken} = useContext(AuthCtx);
+	const {loggedInUserId, accessToken, isAccessTokenValid, logout} = useContext(AuthCtx);
 	const [addressList, setAddressList] = useState([]);
 	const {ServicesCtx} = useServices();
 	const {broadcastMessage} = useContext(ServicesCtx);
+	const navigate = useNavigate();
 
 	let validateData = () => {
 		setBusy(true);
@@ -84,15 +92,22 @@ const Address = ({callbackFunction}) => {
 		}
 		setFormData(data);
 		if(valid) {
-			createAddress(requestJson, accessToken).then(() => {
-				broadcastMessage("Address saved successfully.", "success");
-				setBusy(false);
-				setFormData(initialState);
-				initDropdown();
-			}).catch(json => {
-				broadcastMessage(json.reason, "error");
-				setBusy(false);
-			});
+			if(isAccessTokenValid()) {
+				createAddress(requestJson, accessToken).then(() => {
+					broadcastMessage("Address saved successfully.", "success");
+					setBusy(false);
+					setFormData(initialState);
+					initDropdown();
+				}).catch(json => {
+					broadcastMessage(json.reason, "error");
+					setBusy(false);
+				});
+			} else {
+				broadcastMessage("Session expired. Please login again!", "info");
+				logout().then(() => {
+					navigate("/login");
+				});
+			}
 		} else {
 			setBusy(false);
 		}
@@ -194,12 +209,19 @@ const Address = ({callbackFunction}) => {
 	};
 
 	const initDropdown = useCallback(() => {
-		fetchAllAddresses(accessToken).then((json) => {
-			setAddressList(json.data);
-		}).catch(() => {
-			setAddressList([]);
-		});
-	}, [accessToken]);
+		if(isAccessTokenValid()) {
+			fetchAllAddresses(accessToken).then((json) => {
+				setAddressList(json.data);
+			}).catch(() => {
+				setAddressList([]);
+			});
+		} else {
+			broadcastMessage("Session expired. Please login again!", "info");
+			logout().then(() => {
+				navigate("/login");
+			});
+		}
+	}, [accessToken, isAccessTokenValid, broadcastMessage, navigate, logout]);
 
 	useEffect(() => {
 		initDropdown();
@@ -234,7 +256,27 @@ const Address = ({callbackFunction}) => {
 													key={"sortBy_" + index}
 													value={element.id}
 												>
-													{element.name + " " + element.zipcode}
+													{element.name + ", Contact Number : " + element.contactNumber}
+													<br/>
+													{
+														((element) => {
+															if(element.landmark !== null) {
+																return (
+																	<>
+																		{element.street + ", " + element.landmark}
+																	</>
+																);
+															} else {
+																return (
+																	<>
+																		{element.street}
+																	</>
+																);
+															}
+														})(element)
+													}
+													<br/>
+													{element.city + ", " + element.state + ", " + element.zipcode}
 												</MenuItem>
 											);
 										})

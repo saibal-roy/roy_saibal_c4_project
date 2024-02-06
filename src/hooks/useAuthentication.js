@@ -107,10 +107,14 @@ const useAuthentication = () => {
 		return false;
 	};
 
+	const isAccessTokenValid = () => {
+		return !(accessTokenTimeout !== null && accessTokenTimeout < Date.now());
+	};
+
 	return {
 		AuthCtx,
 		AuthProvider: ({ children }) => (
-			<AuthCtx.Provider value={{ loginError, loggedInUser, loggedInUserId, accessToken, accessTokenTimeout, roles, login, logout, hasRole }}>
+			<AuthCtx.Provider value={{ loginError, loggedInUser, loggedInUserId, accessToken, accessTokenTimeout, roles, login, logout, hasRole, isAccessTokenValid }}>
 				{children}
 			</AuthCtx.Provider>
 		)

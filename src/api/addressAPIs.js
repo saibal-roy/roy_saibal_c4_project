@@ -25,6 +25,11 @@ export const fetchAllAddresses = (accessToken) => {
 					response: response,
 				});
 			}
+		}).catch(() => {
+			promiseRejectRef({
+				reason: "Some error occurred.",
+				response: response,
+			});
 		});
 	}).catch((err) => {
 		promiseRejectRef({
@@ -68,6 +73,11 @@ export const createAddress = (requestJson, accessToken) => {
 					response: response,
 				});
 			}
+		}).catch(() => {
+			promiseRejectRef({
+				reason: "Some error occurred.",
+				response: response,
+			});
 		});
 	}).catch((err) => {
 		promiseRejectRef({

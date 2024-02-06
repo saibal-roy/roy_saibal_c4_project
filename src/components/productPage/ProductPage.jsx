@@ -29,7 +29,7 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 	const {ServicesCtx} = useServices();
 	const {broadcastMessage} = useContext(ServicesCtx);
 	const {AuthCtx} = useAuthentication();
-	const {accessToken} = useContext(AuthCtx);
+	const {accessToken, isAccessTokenValid, logout} = useContext(AuthCtx);
 	const navigate = useNavigate();
 	const location = useLocation();
 	let json = location.state;
@@ -129,15 +129,22 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 		}
 		setFormData(data);
 		if(valid) {
-			callbackFunction(requestJson, accessToken).then(json => {
-				broadcastMessage(json.message, "success");
-				setBusy(false);
-				reFetchAllData();
-				navigate("/home");
-			}).catch(json => {
-				broadcastMessage(json.reason, "error");
-				setBusy(false);
-			});
+			if(isAccessTokenValid()) {
+				callbackFunction(requestJson, accessToken).then(json => {
+					broadcastMessage(json.message, "success");
+					setBusy(false);
+					reFetchAllData();
+					navigate("/home");
+				}).catch(json => {
+					broadcastMessage(json.reason, "error");
+					setBusy(false);
+				});
+			} else {
+				broadcastMessage("Session expired. Please login again!", "info");
+				logout().then(() => {
+					navigate("/login");
+				});
+			}
 		} else {
 			setBusy(false);
 		}
@@ -174,12 +181,12 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 					break;
 				}
 				case "availableItems": {
-					valid = matchRegex(value, "^([1-9]{1}[0-9]{1,8})$");
+					valid = matchRegex(value, "^([1-9]{1}[0-9]{0,8})$");
 					message = "Please enter valid number.";
 					break;
 				}
 				case "price": {
-					valid = matchRegex(value, "^([1-9]{1}[0-9]{1,8})$");
+					valid = matchRegex(value, "^([1-9]{1}[0-9]{0,8})$");
 					message = "Please enter valid amount.";
 					break;
 				}
@@ -200,7 +207,7 @@ const ProductPage = ({categories, mode, headingText, buttonText, callbackFunctio
 						valid = false;
 						message = "Description can be of length 255 characters";
 					} else {
-						valid = matchRegex(value, "^([A-Za-z0-9_@%*.-\\s\\[\\]\\,\\(\\)]{1,255})$");
+						valid = matchRegex(value, "^([A-Za-z0-9_@%*.-\\s\\[\\]\\,\\(\\)\\']{1,255})$");
 						message = "Please enter valid description.";
 					}
 					break;

@@ -1,6 +1,6 @@
 import "./App.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Layout from "./components/layout/layout";
+import Layout from "./components/layout/Layout";
 import { useDispatch } from "react-redux";
 import { useCallback, useEffect } from "react";
 import { initCatalog } from "./store/actions/metadataAction";

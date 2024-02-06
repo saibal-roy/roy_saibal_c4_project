@@ -6,7 +6,7 @@ import {useContext, useState} from "react";
 import {Modal} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import {deleteProduct} from "../../api";
+import {deleteProduct} from "../../api/productAPIs";
 import useAuthentication from "../../hooks/useAuthentication";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";

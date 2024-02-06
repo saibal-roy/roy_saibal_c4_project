@@ -1,6 +1,8 @@
-import {fetchAllCategories, fetchAllProducts} from "../../api";
+import {fetchAllProducts} from "../../api/productAPIs";
+import {fetchAllCategories} from "../../api/categoryAPIs";
 
 export const setFilter = (category) => {
+	//Note: used for filtering of products based on selected category
 	return {
 		type: "SET_FILTER",
 		category: category,
@@ -8,12 +10,14 @@ export const setFilter = (category) => {
 };
 
 export const clearFilter = () => {
+	//Note: for clearing filter
 	return {
 		type: "CLEAR_FILTER",
 	}
 };
 
 export const initCatalog = () => dispatch => {
+	//Note: Initialise catalog by fetching all categories and all products
 	Promise.all([fetchAllCategories(), fetchAllProducts()]).then(json => {
 		dispatch({
 			type: "INIT_CATALOG",
@@ -30,6 +34,7 @@ export const initCatalog = () => dispatch => {
 };
 
 export const setSortBy = (sortBy) => {
+	//Note: used for of products
 	return {
 		type: "SET_SORTING",
 		sortBy: sortBy,

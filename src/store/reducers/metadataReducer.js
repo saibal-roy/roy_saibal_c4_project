@@ -1,3 +1,5 @@
+//Note: we don't need to save initial data in browser cache, as according to question
+//only user login data must be saved in browser cache
 let initialState = {
 	selectedCategory: null,
 	categories: [],

@@ -1,8 +1,9 @@
 import {createContext, useState} from "react";
-import {doLogin} from "../api";
+import {doLogin} from "../api/userAuthAPIs";
 
 const AuthCtx = createContext();
 
+//Note: this hook is used for auth purposes and will be saved in browser cache
 const useAuthentication = () => {
 
 	let initialState = localStorage.getItem("ecommerce_upgrad_logged_in_user_details");

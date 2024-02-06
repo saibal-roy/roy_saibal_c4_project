@@ -2,6 +2,10 @@ import {createContext, useState} from "react";
 
 const ServicesCtx = createContext();
 
+//Note: this is custom service hook, it is used for displaying alert messages to user,
+//since react will keep repainting components according to its internal logic,
+//alert messages may not be visible at correct moment or may get lost during repainting cycle of react,
+//this hook ensures that such cases don't happen
 const useServices = () => {
 
 	const [message, setMessage] = useState(null);

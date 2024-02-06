@@ -8,7 +8,7 @@ import {Link, Navigate} from "react-router-dom";
 import {useContext, useState} from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import {doSignup} from "../../api";
+import {doSignup} from "../../api/userAuthAPIs";
 import useAuthentication from "../../hooks/useAuthentication";
 import useServices from "../../hooks/useServices";
 
